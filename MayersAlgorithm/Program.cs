@@ -1,126 +1,75 @@
 ﻿namespace MayersAlgorithm
 {
+    using System;
+    using System.Collections.Generic;
+
     class MyersDiff
     {
+        static int[,] LCSLength(char[] X, char[] Y)
+        {
+            int m = X.Length;
+            int n = Y.Length;
+
+            int[,] C = new int[m + 1, n + 1];
+
+            for (int i = 0; i <= m; i++)
+            {
+                C[i, 0] = 0;
+            }
+            for (int j = 0; j <= n; j++)
+            {
+                C[0, j] = 0;
+            }
+            for (int i = 1; i <= m; i++)
+            {
+                for (int j = 1; j <= n; j++)
+                {
+                    if (X[i - 1] == Y[j - 1])
+                    {
+                        C[i, j] = C[i - 1, j - 1] + 1;
+                    }
+                    else
+                    {
+                        C[i, j] = Math.Max(C[i, j - 1], C[i - 1, j]);
+                    }
+                }
+            }
+
+            return C;
+        }
+        static void PrintDiff(int[,] C, char[] X, char[] Y, int i, int j)
+        {
+            if (i-1 >= 0 && j -1>= 0 && X[i-1] == Y[j-1])
+            {
+                PrintDiff(C, X, Y, i - 1, j - 1);
+                Console.WriteLine("= " + X[i - 1]);
+            }
+            else if (j > 0 && (i == 0 || C[i, j - 1] >= C[i - 1, j]))
+            {
+                PrintDiff(C, X, Y, i, j - 1);
+                Console.WriteLine("+ " + Y[j-1]);
+            }
+            else if (i > 0 && (j == 0 || C[i, j - 1] < C[i - 1, j]))
+            {
+                PrintDiff(C, X, Y, i - 1, j);
+                Console.WriteLine("- " + X[i - 1]);
+            }
+            else
+            {
+                Console.Write("");
+            }
+        }
         static void Main()
         {
-            string oldText = "ABCABBA";
-            string newText = "CBABAC";
+            char[] X = "BACAAC".ToCharArray();
+            char[] Y = "CBCBAB".ToCharArray();
 
-            List<string> differences = MyersDiffAlgorithm(oldText, newText);
-
-            foreach (var diff in differences)
-            {
-                Console.WriteLine(diff);
-            }
-        }
-
-        static List<string> MyersDiffAlgorithm(string oldText, string newText)
-        {
-            List<string> differences = new List<string>();
-            int[][] v = new int[oldText.Length + newText.Length + 1][];
-            int[] path = new int[2 * (oldText.Length + newText.Length) + 2];
-
-            for (int d = 0; d < v.Length; d++)
-            {
-                v[d] = new int[oldText.Length + 1];
-            }
-
-            for (int d = 0; d < v.Length; d++)
-            {
-                for (int k = -d; k <= d; k += 2)
-                {
-                    int x, y;
-                    bool down = (k == -d || (k != d && v[d - 1][k - 1] < v[d - 1][k + 1]));
-
-                    if (down)
-                    {
-                        x = v[d - 1][k + 1];
-                    }
-                    else
-                    {
-                        x = v[d - 1][k - 1] + 1;
-                    }
-
-                    y = x - k;
-
-                    while (x < oldText.Length && y < newText.Length && oldText[x] == newText[y])
-                    {
-                        x++;
-                        y++;
-                    }
-
-                    v[d][k] = x;
-
-                    if (x == oldText.Length && y == newText.Length)
-                    {
-                        Backtrack(differences, path, oldText, newText, v, path.Length - 2);
-                        return differences;
-                    }
-                }
-
-                for (int k = -d; k <= d; k += 2)
-                {
-                    int x, y;
-                    bool down = (k == -d || (k != d && v[d - 1][k - 1] < v[d - 1][k + 1]));
-
-                    if (down)
-                    {
-                        x = v[d - 1][k + 1];
-                    }
-                    else
-                    {
-                        x = v[d - 1][k - 1] + 1;
-                    }
-
-                    y = x - k;
-
-                    path[path.Length - 1] = x;
-                    path[path.Length - 2] = y;
-
-                    while (x < oldText.Length && y < newText.Length && oldText[x] == newText[y])
-                    {
-                        x++;
-                        y++;
-                        path[path.Length - 1]++;
-                        path[path.Length - 2]++;
-                    }
-
-                    v[d][k] = x;
-
-                    if (x == oldText.Length && y == newText.Length)
-                    {
-                        Backtrack(differences, path, oldText, newText, v, path.Length - 2);
-                        return differences;
-                    }
-                }
-            }
-
-            return differences;
-        }
-
-        static void Backtrack(List<string> differences, int[] path, string oldText, string newText, int[][] v, int pathIndex)
-        {
-            if (pathIndex <= 0)
-            {
-                return;
-            }
-
-            int x = path[pathIndex];
-            int y = path[--pathIndex];
-
-            Backtrack(differences, path, oldText, newText, v, pathIndex);
-
-            while (x < oldText.Length && y < newText.Length && oldText[x] == newText[y])
-            {
-                x++;
-                y++;
-            }
-
-            if (x < oldText.Length || y < newText.Length)
-            {
-                differences.Add($"Delete: {oldText.Substring(x, oldText.Length - x)}, Insert: {newText.Substring(y, newText.Length - y)}");
-            }
-        }
+            int[,] result = LCSLength(X, Y);
+            
+            int m = X.Length;
+            int n = Y.Length;
+            PrintDiff(result, X, Y, m, n);
+        } 
     }
+
 }
