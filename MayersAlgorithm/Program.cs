@@ -54,8 +54,8 @@
         }
         static void Main()
         {
-            char[] startWord = "BAC".ToCharArray();
-            char[] endWord = "BAB".ToCharArray();
+            char[] startWord = "BACAAC".ToCharArray();
+            char[] endWord = "CBCBAB".ToCharArray();
 
             int[,] result = LCSTable(startWord, endWord);
 
