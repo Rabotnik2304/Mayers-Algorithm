@@ -1,8 +1,5 @@
 ﻿namespace MayersAlgorithm
 {
-    using System;
-    using System.Collections.Generic;
-
     class MyersDiff
     {
         static int[,] LCSTable(char[] startWord, char[] endWord)
