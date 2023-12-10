@@ -5,26 +5,19 @@
 
     class MyersDiff
     {
-        static int[,] LCSLength(char[] X, char[] Y)
+        static int[,] LCSTable(char[] startWord, char[] endWord)
         {
-            int m = X.Length;
-            int n = Y.Length;
+            int n = endWord.Length;
 
-            int[,] C = new int[m + 1, n + 1];
+            int m = startWord.Length;
 
-            for (int i = 0; i <= m; i++)
+            int[,] C = new int[n + 1 , m + 1];
+
+            for (int i = 1; i <= n; i++)
             {
-                C[i, 0] = 0;
-            }
-            for (int j = 0; j <= n; j++)
-            {
-                C[0, j] = 0;
-            }
-            for (int i = 1; i <= m; i++)
-            {
-                for (int j = 1; j <= n; j++)
+                for (int j = 1; j <= m; j++)
                 {
-                    if (X[i - 1] == Y[j - 1])
+                    if (startWord[j - 1] == endWord[i - 1])
                     {
                         C[i, j] = C[i - 1, j - 1] + 1;
                     }
@@ -37,22 +30,22 @@
 
             return C;
         }
-        static void PrintDiff(int[,] C, char[] X, char[] Y, int i, int j)
+        static void PrintDiff(int[,] C, char[] startWord, char[] endWord, int lineIndex, int columnIndex)
         {
-            if (i-1 >= 0 && j -1>= 0 && X[i-1] == Y[j-1])
+            if (lineIndex-1 >= 0 && columnIndex-1 >= 0 && startWord[columnIndex - 1] == endWord[lineIndex-1])
             {
-                PrintDiff(C, X, Y, i - 1, j - 1);
-                Console.WriteLine("= " + X[i - 1]);
+                PrintDiff(C, startWord, endWord, lineIndex - 1, columnIndex - 1);
+                Console.WriteLine("= " + endWord[lineIndex - 1]);
             }
-            else if (j > 0 && (i == 0 || C[i, j - 1] >= C[i - 1, j]))
+            else if (columnIndex > 0 && (lineIndex == 0 || C[lineIndex, columnIndex - 1] > C[lineIndex - 1, columnIndex]))
             {
-                PrintDiff(C, X, Y, i, j - 1);
-                Console.WriteLine("+ " + Y[j-1]);
+                PrintDiff(C, startWord, endWord, lineIndex, columnIndex - 1);
+                Console.WriteLine("- " + startWord[columnIndex-1]);
             }
-            else if (i > 0 && (j == 0 || C[i, j - 1] < C[i - 1, j]))
+            else if (lineIndex > 0 && (columnIndex == 0 || C[lineIndex, columnIndex - 1] <= C[lineIndex - 1, columnIndex]))
             {
-                PrintDiff(C, X, Y, i - 1, j);
-                Console.WriteLine("- " + X[i - 1]);
+                PrintDiff(C, startWord, endWord, lineIndex - 1, columnIndex);
+                Console.WriteLine("+ " + endWord[lineIndex - 1]);
             }
             else
             {
@@ -61,14 +54,39 @@
         }
         static void Main()
         {
-            char[] X = "BACAAC".ToCharArray();
-            char[] Y = "CBCBAB".ToCharArray();
+            char[] startWord = "BAC".ToCharArray();
+            char[] endWord = "BAB".ToCharArray();
 
-            int[,] result = LCSLength(X, Y);
-            
-            int m = X.Length;
-            int n = Y.Length;
-            PrintDiff(result, X, Y, m, n);
+            int[,] result = LCSTable(startWord, endWord);
+
+            Console.Write("    ");
+            for(int k=0; k < startWord.Length; k++)
+            {    
+               Console.Write(startWord[k] + " ");
+            }
+            Console.WriteLine();
+
+            for(int i=0;i<endWord.Length+1;i++)
+            {
+                if (i >= 1)
+                {
+                    Console.Write(endWord[i-1] + " ");
+                }
+                else
+                {
+                    Console.Write("  ");
+                }
+                for (int j = 0; j < startWord.Length+1; j++)
+                {
+                    Console.Write(result[i,j]+" ");
+                }
+                Console.WriteLine();
+            }
+
+            Console.WriteLine();
+            int n = endWord.Length;
+            int m = startWord.Length;
+            PrintDiff(result, startWord, endWord, n, m);
         } 
     }
 
